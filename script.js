@@ -1,4 +1,3 @@
-/* ═══════════════════ FIREBASE ═══════════════════ */
 const firebaseConfig = {
   apiKey: "AIzaSyAA6lc6-CFTn56ApNnnATiMUheDpqCaSkQ",
   authDomain: "sm-topup-f5ae0.firebaseapp.com",
@@ -13,7 +12,6 @@ try { if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); db=fireb
 const $ = (id) => document.getElementById(id);
 const setText = (id, v) => { const el = $(id); if(el) el.textContent = v; };
 
-/* ═══════════════════ STATE ═══════════════════ */
 let currentUser=null, userData={}, userBalance=0, totalSpend=0, weeklySpend=0;
 let allGames=[], gamesCache={}, allCategories=[];
 let currentGame=null, selectedProduct=null, selectedPayOpt='wallet';
@@ -35,7 +33,6 @@ const DEFAULT_LOGOS = {
   rocket: 'https://i.ibb.co.com/wFZkNM48/rocket-color-logo-mobile-banking-icon-free-png.png'
 };
 
-/* ═══════════════════ UTILS ═══════════════════ */
 function toast(msg, color='#0f172a'){ 
   const t=$('toast'); t.textContent=msg; t.style.background=color; t.classList.add('show'); 
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200); 
@@ -44,7 +41,6 @@ function lockBody(){ const y=window.scrollY; document.body.style.top=`-${y}px`; 
 function unlockBody(){ const y=document.body.style.top; document.body.classList.remove('modal-open'); document.body.style.top=''; if(y) window.scrollTo(0,parseInt(y||'0')*-1); }
 function fmtDate(dv){ if(!dv) return 'N/A'; const d=dv.toDate?dv.toDate():new Date(dv); return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
 
-/* ═══════════════════ AUTH ═══════════════════ */
 function toggleAuth(mode){
   if(mode==='login'){ $('loginForm').classList.remove('hidden'); $('registerForm').classList.add('hidden'); $('btnLogin').classList.add('on'); $('btnReg').classList.remove('on'); }
   else { $('loginForm').classList.add('hidden'); $('registerForm').classList.remove('hidden'); $('btnReg').classList.add('on'); $('btnLogin').classList.remove('on'); }
@@ -91,7 +87,6 @@ auth.onAuthStateChanged(async user => {
   }
 });
 
-/* ═══════════════════ LISTENERS ═══════════════════ */
 function startListeners(){
   db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
     if(!doc.exists) return;
@@ -141,14 +136,12 @@ function startListeners(){
     document.title = siteName;
     setText('authBrand', siteName);
     setText('fSiteName', siteName);
-    
     if(siteConfig.userLogoUrl || siteConfig.logoUrl){
       $('siteLogo').src = siteConfig.userLogoUrl || siteConfig.logoUrl;
     }
     if(siteConfig.userLoginUrl || siteConfig.logoUrl){
       $('loginLogo').innerHTML = '<img src="'+(siteConfig.userLoginUrl || siteConfig.logoUrl)+'">';
     }
-    
     if(siteConfig.walletLogo && siteConfig.walletLogo.trim()){
       $('walletLogoBox').innerHTML = '<img src="'+siteConfig.walletLogo+'">';
     }
@@ -207,7 +200,6 @@ function updateAvatar(elId, picUrl, letter){
   }
 }
 
-/* ═══════════════════ QUICK LINKS & SLIDER ═══════════════════ */
 function renderQuickLinks() {
   const container = $('quickLinksContainer'); if(!container) return;
   const links = [
@@ -221,7 +213,6 @@ function renderQuickLinks() {
       <span>${l.label}</span>
     </a>
   `).join('');
-  
   const siteLinks = { 'telegram-channel': siteConfig.telegram, 'telegram-group': siteConfig.groupLink, 'youtube-channel': siteConfig.youtube };
   Object.keys(siteLinks).forEach(k => {
     document.querySelectorAll(`[data-link="${k}"]`).forEach(a => {
@@ -261,13 +252,7 @@ function updateSlidePosition() {
   const dots = document.querySelectorAll('#dots i');
   dots.forEach((d, i) => d.classList.toggle('on', i === bannerIndex));
 }
-
-function goSlide(i) {
-  bannerIndex = i;
-  updateSlidePosition();
-  resetSliderTimer();
-}
-
+function goSlide(i) { bannerIndex = i; updateSlidePosition(); resetSliderTimer(); }
 function resetSliderTimer() {
   clearInterval(bannerTimer);
   if(bannersList.length <= 1) return;
@@ -289,7 +274,6 @@ $('track')?.addEventListener('touchend', e => {
   }
 }, {passive:true});
 
-/* ═══════════════════ RANK SYSTEM ═══════════════════ */
 const DEFAULT_RANKS = [
   {name:'Bronze', min:0, max:100, tagline:'Start your journey', color:'#b45309', icon:'fa-medal'},
   {name:'Silver', min:101, max:1000, tagline:'Keep grinding', color:'#64748b', icon:'fa-medal'},
@@ -311,7 +295,7 @@ function computeRank() {
   }
   setText('rankName', cur.name);
   setText('rankTagline', cur.tagline || '');
-  const iconBox = $('rankIconBox'), faIcon = $('rankFaIcon'), imgIcon = $('rankImg');
+  const faIcon = $('rankFaIcon'), imgIcon = $('rankImg');
   if(cur.png && cur.png.trim()) {
     imgIcon.src = cur.png; imgIcon.style.display = 'block'; faIcon.style.display = 'none';
   } else {
@@ -333,7 +317,6 @@ function computeRank() {
   }
 }
 
-/* ═══════════════════ HOME PRODUCTS ═══════════════════ */
 function renderHomeProducts(){
   const container = $('dynamicCategories'); if(!container) return;
   if(allGames.length===0){ 
@@ -373,7 +356,6 @@ function renderHomeProducts(){
   container.innerHTML = html;
 }
 
-/* ═══════════════════ GAME VIEW ═══════════════════ */
 function openGame(gid){
   const g = gamesCache[gid]; if(!g) return;
   currentGame = g;
@@ -410,9 +392,7 @@ function openGame(gid){
         const inStock = p.stock !== false && p.stock !== 'out';
         const price = parseInt(p.price||0);
         const name = (p.name||'-').replace(/'/g,'&#39;');
-        html += `<button type="button" class="pk ${inStock?'':'out'}" data-id="${d.id}" data-name="${name}" data-price="${price}" ${inStock?'':'disabled'} onclick="pickPkg(this)">
-          <span>${name}</span><b>BDT ${price}</b>
-        </button>`;
+        html += `<button type="button" class="pk ${inStock?'':'out'}" data-id="${d.id}" data-name="${name}" data-price="${price}" ${inStock?'':'disabled'} onclick="pickPkg(this)"><span>${name}</span><b>BDT ${price}</b></button>`;
       });
       grid.innerHTML = html;
     })
@@ -492,12 +472,8 @@ function buyNow(){
   } else {
     checkoutContext = 'order';
     pendingOrder = {
-      gameId: currentGame.id,
-      gameName: currentGame.name,
-      playerId: uid,
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      price: selectedProduct.price
+      gameId: currentGame.id, gameName: currentGame.name, playerId: uid,
+      productId: selectedProduct.id, productName: selectedProduct.name, price: selectedProduct.price
     };
     depositAmount = selectedProduct.price;
     $('payViewTitle').textContent = "COMPLETE ORDER PAYMENT";
@@ -542,7 +518,6 @@ async function confirmWalletOrder(uid){
   } catch(e){ Swal.fire('Error', e.message, 'error'); }
 }
 
-/* ═══════════════════ PREMIUM ADD MONEY & CHECKOUT SYSTEM ═══════════════════ */
 function quickAmt(a){ const inp = $('depAmount'); inp.value = (parseInt(inp.value)||0) + a; }
 
 function goToPayMethod(){
@@ -626,9 +601,7 @@ function selectDepMethod(method) {
 function copyNum(id) {
   const el = $(id); if(!el) return;
   const text = el.textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    toast('Number Copied ✓', '#10b981');
-  });
+  navigator.clipboard.writeText(text).then(() => { toast('Number Copied ✓', '#10b981'); });
 }
 
 async function submitPayment() {
@@ -641,9 +614,7 @@ async function submitPayment() {
   btn.disabled = true;
   try {
     const duplicateCheck = await db.collection('deposits').where('trxId', '==', trx).get();
-    if(!duplicateCheck.empty) {
-      throw new Error('এই Transaction ID আগে ব্যবহার করা হয়েছে!');
-    }
+    if(!duplicateCheck.empty) { throw new Error('এই Transaction ID আগে ব্যবহার করা হয়েছে!'); }
     if (checkoutContext === 'order' && pendingOrder) {
        await db.collection('orders').add({
          userId: currentUser.uid, userName: userData.name || currentUser.email, userEmail: currentUser.email,
@@ -672,7 +643,6 @@ async function submitPayment() {
   }
 }
 
-/* ═══════════════════ ORDERS & CODES ═══════════════════ */
 async function loadOrders(){
   const list = $('ordersList'); if(!list) return;
   list.innerHTML = '<div style="text-align:center;padding:30px"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:#2563eb"></i></div>';
@@ -746,13 +716,9 @@ async function submitRedeem(){
   } catch(e){ Swal.fire('Error', e.message, 'error'); }
 }
 
-/* ═══════════════════ NAVIGATION ═══════════════════ */
 function showSec(id){
   const views = ['homeView', 'productView', 'ordersView', 'addmoneyView', 'paymentView', 'codesView', 'accountView'];
-  views.forEach(v => {
-    const el = $(v);
-    if(el) el.classList.add('hidden');
-  });
+  views.forEach(v => { const el = $(v); if(el) el.classList.add('hidden'); });
   let targetId = id + 'View';
   if(id === 'product') targetId = 'productView';
   if(id === 'payment') targetId = 'paymentView';
@@ -768,14 +734,12 @@ function showSec(id){
 }
 function goHome(){ showSec('home'); }
 
-/* ═══════════════════ ACCOUNT PANEL ═══════════════════ */
 function openAcc(){ $('accPanel').classList.add('show'); lockBody(); }
 function closeAcc(){ $('accPanel').classList.remove('show'); unlockBody(); }
 function openAccNav(tab){ closeAcc(); setTimeout(()=>showSec(tab), 250); }
 function openAccLogout(){ closeAcc(); setTimeout(()=>doLogout(), 250); }
 function handleAccOverlayClick(event) { if(event.target.id === 'accPanel') closeAcc(); }
 
-/* ═══════════════════ EDIT PROFILE ═══════════════════ */
 function openEditProfile(){
   $('editPic').value = userData.profilePic || '';
   $('editName').value = userData.name || '';
@@ -798,7 +762,6 @@ async function saveProfile(){
   } catch(e){ Swal.fire('Error', e.message, 'error'); }
 }
 
-/* ═══════════════════ AVC MODAL ═══════════════════ */
 function openAVC() {
   $('avcModal').classList.add('show');
   $('avcUid').value = '';
@@ -849,8 +812,7 @@ async function checkAVC() {
   }
 }
 
-/* ═══════════════════ INIT ═══════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  $('siteLogo').src = 'Main logo.jpg';
+  $('siteLogo').src = 'Main-logo.jpg';
   $('fb')?.addEventListener('click', () => $('fab').classList.toggle('open'));
 });
